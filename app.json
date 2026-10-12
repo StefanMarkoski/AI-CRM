@@ -30,7 +30,8 @@
     ],
     "scheme": "crmai",
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "baseUrl": "/AI-CRM"
     }
   }
 }

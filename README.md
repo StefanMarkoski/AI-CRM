@@ -7,10 +7,18 @@ It runs in the browser, on tablets, and on phones from the same code. All data i
 
 ```bash
 npm install
-npm run web        # opens http://localhost:8081
+npm run web        # opens http://localhost:8081/AI-CRM/
 npm run android    # or scan the QR code with Expo Go
 npm run typecheck
 ```
+
+## Live demo
+
+Deployed to GitHub Pages on every push to `main` (see `.github/workflows/deploy-pages.yml`):
+https://stefanmarkoski.github.io/AI-CRM/
+
+Because of the Pages subpath, `app.json` sets `experiments.baseUrl` to `/AI-CRM`,
+so the local dev server also serves the app at `http://localhost:8081/AI-CRM/`.
 
 ## Structure
 
