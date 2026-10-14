@@ -13,8 +13,9 @@ import {
 import { StyleSheet, View } from 'react-native';
 
 import { useCrm } from '@/store/crm';
-import { colors, radius, spacing } from '@/theme';
+import { colors, elevation, radius, spacing } from '@/theme';
 
+import { glassBlur } from './Panel';
 import { Hoverable, T } from './primitives';
 
 interface NavItem {
@@ -75,7 +76,7 @@ export function Sidebar({ collapsed }: { collapsed: boolean }) {
   };
 
   return (
-    <View style={[styles.rail, collapsed && styles.railCollapsed]}>
+    <View style={[styles.rail, glassBlur, collapsed && styles.railCollapsed]}>
       <View style={[styles.brand, collapsed && { alignItems: 'center', paddingLeft: 0 }]}>
         <View style={styles.logo}>
           <Atom size={16} color={colors.background} strokeWidth={1.8} />
@@ -92,6 +93,9 @@ const styles = StyleSheet.create({
   rail: {
     width: 187,
     backgroundColor: colors.sidebar,
+    borderRightWidth: 1,
+    borderColor: colors.glassBorder,
+    ...elevation.panel,
     borderTopRightRadius: radius.xl,
     borderBottomRightRadius: radius.xl,
     paddingHorizontal: 23,
@@ -144,6 +148,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: colors.text,
     borderWidth: 1.5,
-    borderColor: colors.sidebar,
+    borderColor: colors.panel,
   },
 });

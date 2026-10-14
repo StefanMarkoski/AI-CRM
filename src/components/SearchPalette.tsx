@@ -6,7 +6,7 @@ import { Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, useWindo
 import { useOnChange } from '@/hooks/useOnChange';
 import { useCrm } from '@/store/crm';
 import { useUi } from '@/store/ui';
-import { colors, fonts, radius, spacing } from '@/theme';
+import { colors, elevation, fonts, radius, spacing } from '@/theme';
 import { formatShortDate } from '@/utils/dates';
 
 import { Hoverable, T, webInputReset } from './primitives';
@@ -120,7 +120,7 @@ export function SearchPalette() {
               <Hoverable
                 key={r.key}
                 onPress={() => go(r)}
-                style={({ hovered }) => [styles.result, hovered && { backgroundColor: colors.surface }]}
+                style={({ hovered }) => [styles.result, hovered && { backgroundColor: colors.surface }, hovered && elevation.raised]}
               >
                 <r.icon size={18} color={colors.textSecondary} strokeWidth={1.5} />
                 <View style={{ flex: 1 }}>
@@ -139,7 +139,7 @@ export function SearchPalette() {
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: colors.overlay, alignItems: 'center', paddingTop: 120 },
   card: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.panel,
     borderRadius: radius.xl,
     overflow: 'hidden',
     shadowColor: '#000',

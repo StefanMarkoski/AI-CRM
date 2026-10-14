@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
 
 import { Field, Input, Segmented, T } from '@/components/primitives';
+import { Panel } from '@/components/Panel';
 import { Screen } from '@/components/Screen';
-import { colors, radius, spacing } from '@/theme';
+import { colors, elevation, radius, spacing } from '@/theme';
 
 export default function Settings() {
   const [name, setName] = useState('Stefan Markoski');
@@ -45,10 +46,10 @@ export default function Settings() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View style={{ gap: spacing.lg }}>
+    <Panel style={{ gap: spacing.lg }}>
       <T variant="title">{title}</T>
       {children}
-    </View>
+    </Panel>
   );
 }
 
@@ -62,7 +63,7 @@ function Toggle({ label, hint, value, onChange }: { label: string; hint: string;
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ false: colors.surface, true: colors.selected }}
+        trackColor={{ false: colors.tile, true: colors.selected }}
         thumbColor={value ? colors.text : colors.white}
         {...({ activeThumbColor: colors.text } as object)}
       />
@@ -71,9 +72,10 @@ function Toggle({ label, hint, value, onChange }: { label: string; hint: string;
 }
 
 const styles = StyleSheet.create({
-  wrap: { maxWidth: 560, gap: spacing.xxxl, marginTop: -spacing.xl },
+  wrap: { maxWidth: 640, gap: 14 },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
   integration: {
+    ...elevation.raised,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

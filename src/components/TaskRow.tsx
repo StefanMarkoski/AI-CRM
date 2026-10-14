@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import type { Task } from '@/data/mock';
 import { useCrm } from '@/store/crm';
-import { colors, radius, spacing } from '@/theme';
+import { colors, elevation, radius, spacing } from '@/theme';
 import { formatShortDate, formatTime } from '@/utils/dates';
 
 import { Hoverable, T } from './primitives';
@@ -11,16 +11,19 @@ import { Hoverable, T } from './primitives';
 interface TaskRowProps {
   task: Task;
   showDate?: boolean;
+  /** Show the client's contact person column. */
+  showContact?: boolean;
   selected?: boolean;
   onPress?: () => void;
   /** Square completion toggle to the right of the row (dashboard style). */
   withCheck?: boolean;
 }
 
-export function TaskRow({ task, showDate, selected, onPress, withCheck }: TaskRowProps) {
+export function TaskRow({ task, showDate, showContact, selected, onPress, withCheck }: TaskRowProps) {
   const { clientById, toggleTask } = useCrm();
   const client = clientById(task.clientId);
   const done = task.completed;
+  const tone = done ? colors.textMuted : colors.text;
 
   return (
     <View style={styles.wrap}>
@@ -37,20 +40,20 @@ export function TaskRow({ task, showDate, selected, onPress, withCheck }: TaskRo
           },
         ]}
       >
-        <T
-          variant="small"
-          numberOfLines={1}
-          style={[styles.title, done && styles.done]}
-          color={done ? colors.textMuted : colors.text}
-        >
+        <T variant="label" numberOfLines={1} style={[styles.col, done && styles.done]} color={tone}>
           {task.title}
         </T>
-        <T variant="label" numberOfLines={1} style={styles.company} color={done ? colors.textMuted : colors.text}>
+        <T variant="label" numberOfLines={1} style={styles.col} color={tone}>
           {client?.company ?? '—'}
         </T>
+        {showContact && (
+          <T variant="label" numberOfLines={1} style={styles.col} color={tone}>
+            {client?.contactName ?? '—'}
+          </T>
+        )}
         <View style={styles.when}>
-          {showDate && <T variant="small">{formatShortDate(task.due)}</T>}
-          <T variant="small">{formatTime(task.due)}</T>
+          {showDate && <T variant="label" color={tone}>{formatShortDate(task.due)}</T>}
+          <T variant="label" color={tone}>{formatTime(task.due)}</T>
         </View>
       </Hoverable>
       {withCheck && (
@@ -73,26 +76,56 @@ export function TaskRow({ task, showDate, selected, onPress, withCheck }: TaskRo
   );
 }
 
+/** Small bulleted column labels shown above a list of TaskRows. */
+export function TaskColumns({ showContact, showDate, withCheck }: {
+  showContact?: boolean; showDate?: boolean; withCheck?: boolean;
+}) {
+  const label = (text: string, style?: object) => (
+    <View style={[styles.headCell, style]}>
+      <View style={styles.dot} />
+      <T variant="caption" color={colors.textSecondary} style={{ fontSize: 11 }}>{text}</T>
+    </View>
+  );
+  return (
+    <View style={styles.wrap}>
+      <View style={[styles.head, { flex: 1 }]}>
+        {label('Task Title', styles.col)}
+        {label('Company', styles.col)}
+        {showContact && label('Contact', styles.col)}
+        {label(showDate ? 'Date · Time' : 'Time', styles.whenHead)}
+      </View>
+      {withCheck && <View style={{ width: CHECK }} />}
+    </View>
+  );
+}
+
+const CHECK = 44;
+
 const styles = StyleSheet.create({
-  wrap: { flexDirection: 'row', gap: spacing.lg },
+  wrap: { flexDirection: 'row', gap: spacing.md + 2 },
   row: {
+    ...elevation.raised,
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    height: 40,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.md,
+    height: 46,
+    paddingHorizontal: spacing.lg - 2,
+    borderRadius: radius.md - 2,
     gap: spacing.md,
   },
-  title: { flex: 1.1 },
-  company: { flex: 1 },
-  when: { flexDirection: 'row', gap: spacing.lg, justifyContent: 'flex-end' },
+  col: { flex: 1 },
+  when: { flexDirection: 'row', gap: spacing.lg, justifyContent: 'flex-end', minWidth: 44 },
   done: { textDecorationLine: 'line-through' },
   check: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
+    ...elevation.raised,
+    width: CHECK,
+    height: 46,
+    borderRadius: radius.md - 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.lg - 2, gap: spacing.md },
+  headCell: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  whenHead: { minWidth: 44, justifyContent: 'flex-end' },
+  dot: { width: 3, height: 3, borderRadius: 1.5, backgroundColor: colors.textSecondary },
 });

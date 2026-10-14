@@ -6,12 +6,13 @@ import { StyleSheet, View } from 'react-native';
 import { DeleteButton } from '@/components/ConfirmButton';
 import { EmptyState, Field, Hoverable, Input, PillButton, T } from '@/components/primitives';
 import { ScheduleMailSheet } from '@/components/ScheduleMailSheet';
+import { Panel } from '@/components/Panel';
 import { Screen, useLayout } from '@/components/Screen';
 import { Sheet } from '@/components/Sheet';
 import type { Template } from '@/data/mock';
 import { useOnChange } from '@/hooks/useOnChange';
 import { useCrm } from '@/store/crm';
-import { colors, radius, spacing } from '@/theme';
+import { colors, elevation, radius, spacing } from '@/theme';
 import { timeAgo } from '@/utils/dates';
 
 // Show the default sample contact in previews so templates read naturally.
@@ -38,8 +39,8 @@ export default function Templates() {
       actions={<PillButton icon={Plus} label="New Template" onPress={() => setEditing('new')} />}
     >
       <View style={[styles.columns, !split && { flexDirection: 'column' }]}>
-        <View style={styles.gridCol}>
-          <T variant="title" style={{ marginTop: -spacing.lg, marginBottom: spacing.xxl + 4 }}>Templates</T>
+        <Panel style={styles.gridCol}>
+          <T variant="title" style={{ marginBottom: spacing.xl }}>Templates</T>
           <View style={styles.grid}>
             {templates.map((t) => {
               const active = t.id === selectedId;
@@ -65,9 +66,9 @@ export default function Templates() {
               );
             })}
           </View>
-        </View>
+        </Panel>
 
-        <View style={styles.detailCol}>
+        <Panel style={styles.detailCol}>
           {selected ? (
             <View style={{ gap: spacing.lg }}>
               <T variant="title" weight="semibold">{selected.name}</T>
@@ -91,7 +92,7 @@ export default function Templates() {
           ) : (
             <EmptyState title="No template selected" />
           )}
-        </View>
+        </Panel>
       </View>
 
       <TemplateForm initial={editing} onClose={() => setEditing(null)} onCreated={(t) => setSelectedId(t.id)} />
@@ -144,11 +145,11 @@ function TemplateForm({ initial, onClose, onCreated }: {
 }
 
 const styles = StyleSheet.create({
-  columns: { flexDirection: 'row', gap: 120 },
-  gridCol: { flexShrink: 1 },
+  columns: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
+  gridCol: { flexShrink: 1, padding: spacing.xxl },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 24, rowGap: 28, maxWidth: 488 },
   card: { width: 220 },
-  preview: { height: 120, borderRadius: radius.lg, paddingHorizontal: spacing.lg, paddingVertical: spacing.lg },
-  detailCol: { flex: 1, minWidth: 300, maxWidth: 460, marginTop: 30 },
+  preview: { ...elevation.raised, height: 120, borderRadius: radius.lg, paddingHorizontal: spacing.lg, paddingVertical: spacing.lg },
+  detailCol: { flex: 1, minWidth: 300, padding: spacing.xxl },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xl, marginTop: spacing.lg },
 });

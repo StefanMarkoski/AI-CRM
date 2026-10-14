@@ -7,6 +7,7 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { AIDrawer } from '@/components/AIDrawer';
+import { Backdrop } from '@/components/Backdrop';
 import { NewTaskSheet } from '@/components/NewTaskSheet';
 import { useLayout } from '@/components/Screen';
 import { SearchPalette } from '@/components/SearchPalette';
@@ -42,6 +43,7 @@ function Shell() {
   return (
     <SafeAreaView style={styles.app} edges={['top', 'bottom']}>
       <StatusBar style="dark" />
+      <Backdrop />
       <View style={styles.row}>
         <Sidebar collapsed={railCollapsed} />
         <View style={styles.main}>

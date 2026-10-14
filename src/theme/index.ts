@@ -1,18 +1,36 @@
-// Palette sampled directly from the approved mockups (AI-CRM-1..5).
-// Keep everything grayscale until the palette is revisited.
+// Palette sampled from the mockups: AI-CRM-1..5 (structure) and
+// CRM-AI-NEW-LOOK (frosted glass panels over a soft gray→mint gradient).
 export const colors = {
-  background: '#F8F8F6', // main canvas
-  sidebar: '#D9D9D6', // navigation rail
-  surface: '#E8E8E8', // pills, rows, cards
-  surfaceHover: '#DEDEDC',
+  background: '#F8F8F6', // fallback canvas
+  panel: '#EEF3F1', // opaque glass tone (modals, drawers)
+  glass: 'rgba(243, 246, 244, 0.78)', // translucent panels
+  glassBorder: 'rgba(255, 255, 255, 0.7)',
+  sidebar: 'rgba(242, 246, 245, 0.88)', // navigation rail
+  surface: '#F6F6F6', // raised rows, buttons, inputs, chips
+  surfaceHover: '#ECEEEC',
+  tile: '#E8E8E8', // stat tiles, day buttons
+  tileHover: '#DEDEDC',
   selected: '#A4A4A4', // active nav item / selected row
   selectedHover: '#999999',
+  outline: '#CBD0CF', // card outlines
   text: '#171717',
   textSecondary: '#4F4F4F',
   textMuted: '#808080',
-  divider: '#D6D6D3',
-  overlay: 'rgba(23, 23, 23, 0.28)',
+  divider: '#D6DAD8',
+  overlay: 'rgba(23, 35, 33, 0.25)',
   white: '#FFFFFF',
+} as const;
+
+// Background gradient: gray top-left → mint bottom-right, with a light glow top-right.
+export const gradient = {
+  base: ['#DADFDE', '#C6E9E5', '#B4EFE7'] as const,
+  glow: ['rgba(246, 249, 247, 0.9)', 'rgba(246, 249, 247, 0)'] as const,
+};
+
+export const elevation = {
+  raised: { boxShadow: '0px 1px 2px rgba(23, 23, 23, 0.06), 0px 3px 10px rgba(23, 23, 23, 0.04)' },
+  panel: { boxShadow: '0px 10px 30px rgba(30, 70, 65, 0.08)' },
+  overlay: { boxShadow: '0px 18px 50px rgba(23, 35, 33, 0.18)' },
 } as const;
 
 export const fonts = {

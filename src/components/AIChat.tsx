@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { useCrm } from '@/store/crm';
-import { colors, fonts, radius, spacing } from '@/theme';
+import { colors, elevation, fonts, radius, spacing } from '@/theme';
 import { respond, suggestionsFor, thinkingDelay } from '@/utils/mockAI';
 
 import { Hoverable, T, webInputReset } from './primitives';
@@ -102,14 +102,14 @@ const styles = StyleSheet.create({
   thread: { padding: spacing.xl, gap: spacing.md, flexGrow: 1 },
   hero: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.sm, paddingVertical: spacing.xxxl },
   heroIcon: {
-    width: 48, height: 48, borderRadius: radius.lg, backgroundColor: colors.surface,
+    width: 48, height: 48, borderRadius: radius.lg, backgroundColor: colors.tile,
     alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm,
   },
   bubble: { maxWidth: '88%', paddingHorizontal: spacing.lg, paddingVertical: spacing.md, borderRadius: radius.lg },
   user: { alignSelf: 'flex-end', backgroundColor: colors.selected, borderBottomRightRadius: 6 },
-  ai: { alignSelf: 'flex-start', backgroundColor: colors.surface, borderBottomLeftRadius: 6 },
+  ai: { alignSelf: 'flex-start', backgroundColor: colors.surface, borderBottomLeftRadius: 6, ...elevation.raised },
   suggestions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, paddingHorizontal: spacing.xl, paddingBottom: spacing.md },
-  suggestion: { backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: 7 },
+  suggestion: { ...elevation.raised, backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: 7 },
   composer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: radius.lg,
     backgroundColor: colors.surface,
+    ...elevation.raised,
   },
   input: { flex: 1, fontFamily: fonts.regular, fontSize: 14, color: colors.text, height: '100%' },
   send: {

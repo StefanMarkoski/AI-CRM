@@ -7,7 +7,7 @@ It runs in the browser, on tablets, and on phones from the same code. All data i
 
 ```bash
 npm install
-npm run web        # opens http://localhost:8081/AI-CRM/
+npm run web        # opens http://localhost:8081
 npm run android    # or scan the QR code with Expo Go
 npm run typecheck
 ```
@@ -17,8 +17,8 @@ npm run typecheck
 Deployed to GitHub Pages on every push to `main` (see `.github/workflows/deploy-pages.yml`):
 https://stefanmarkoski.github.io/AI-CRM/
 
-Because of the Pages subpath, `app.json` sets `experiments.baseUrl` to `/AI-CRM`,
-so the local dev server also serves the app at `http://localhost:8081/AI-CRM/`.
+Because of the Pages subpath, `app.json` sets `experiments.baseUrl` to `/AI-CRM`.
+This only affects exported builds; the dev server still serves the app at the root.
 
 ## Structure
 

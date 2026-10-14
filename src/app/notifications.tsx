@@ -2,9 +2,10 @@ import { CheckCheck } from 'lucide-react-native';
 import { StyleSheet, View } from 'react-native';
 
 import { Hoverable, PillButton, T } from '@/components/primitives';
+import { Panel } from '@/components/Panel';
 import { Screen } from '@/components/Screen';
 import { useCrm } from '@/store/crm';
-import { colors, radius, spacing } from '@/theme';
+import { colors, elevation, radius, spacing } from '@/theme';
 import { timeAgo } from '@/utils/dates';
 
 export default function Notifications() {
@@ -15,7 +16,7 @@ export default function Notifications() {
       title="Notifications"
       actions={<PillButton icon={CheckCheck} label="Mark all read" onPress={markAllNotificationsRead} />}
     >
-      <View style={styles.list}>
+      <Panel style={styles.list}>
         {notifications.map((n) => (
           <Hoverable
             key={n.id}
@@ -30,14 +31,15 @@ export default function Notifications() {
             <T variant="small" color={colors.textMuted}>{timeAgo(n.at)}</T>
           </Hoverable>
         ))}
-      </View>
+      </Panel>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  list: { gap: spacing.sm, maxWidth: 720, marginTop: -spacing.xl },
+  list: { gap: spacing.sm + 2, maxWidth: 760 },
   row: {
+    ...elevation.raised,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.lg,

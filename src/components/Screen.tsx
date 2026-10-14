@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { useUi } from '@/store/ui';
-import { breakpoints, colors, spacing } from '@/theme';
+import { breakpoints, spacing } from '@/theme';
 
 import { PillButton, T } from './primitives';
 
@@ -29,7 +29,7 @@ interface ScreenProps {
 export function Screen({ title, actions, aiContext, children, scroll = true }: ScreenProps) {
   const { openAI, openSearch } = useUi();
   const { narrow } = useLayout();
-  const pad = narrow ? spacing.lg : 80;
+  const pad = narrow ? spacing.lg : 58;
 
   const header = (
     <View style={[styles.header, narrow && { flexWrap: 'wrap', rowGap: spacing.md }]}>
@@ -65,14 +65,14 @@ export function Screen({ title, actions, aiContext, children, scroll = true }: S
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
-  content: { paddingBottom: 64, maxWidth: 1440, width: '100%' },
+  root: { flex: 1, backgroundColor: 'transparent' },
+  content: { paddingBottom: 48, maxWidth: 1480, width: '100%' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 80,
-    paddingBottom: 77,
+    paddingTop: 68,
+    paddingBottom: 46,
     gap: spacing.lg,
   },
   titleGroup: { flexDirection: 'row', alignItems: 'center', gap: spacing.xl },

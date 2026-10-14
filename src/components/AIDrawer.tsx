@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: colors.overlay, alignItems: 'flex-end' },
   panel: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.panel,
     borderTopLeftRadius: radius.xl,
     borderBottomLeftRadius: radius.xl,
     shadowColor: '#000',

@@ -5,10 +5,11 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Hoverable, IconButton, PillButton, T } from '@/components/primitives';
 import { ScheduleMailSheet } from '@/components/ScheduleMailSheet';
+import { Panel } from '@/components/Panel';
 import { Screen } from '@/components/Screen';
 import { useCrm } from '@/store/crm';
 import { useUi } from '@/store/ui';
-import { colors, radius, spacing } from '@/theme';
+import { colors, elevation, radius, spacing } from '@/theme';
 import { addDays, at, formatDayName, formatShortDate, formatWeekRange, isSameDay, startOfDay, startOfWeek } from '@/utils/dates';
 
 const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
@@ -45,6 +46,7 @@ export default function Calendar() {
         </>
       }
     >
+      <Panel style={styles.panel}>
       <View style={styles.weekHead}>
         <T variant="title">{formatWeekRange(weekStart)}</T>
         <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
@@ -66,7 +68,7 @@ export default function Calendar() {
               onPress={() => setDay(d)}
               style={({ hovered }) => [
                 styles.day,
-                { backgroundColor: active ? colors.selected : hovered ? colors.surfaceHover : colors.surface },
+                { backgroundColor: active ? colors.selected : hovered ? colors.tileHover : colors.tile },
               ]}
             >
               <T variant="body" style={{ fontSize: 16 }}>{formatDayName(d)}</T>
@@ -88,7 +90,7 @@ export default function Calendar() {
             <Hoverable
               key={h}
               onPress={() => openNewTask({ date: at(day, h) })}
-              style={({ hovered }) => [styles.hourRow, hovered && { backgroundColor: 'rgba(0,0,0,0.02)' }]}
+              style={({ hovered }) => [styles.hourRow, hovered && { backgroundColor: 'rgba(255,255,255,0.35)' }]}
             >
               {({ hovered }) => (
                 <>
@@ -123,6 +125,7 @@ export default function Calendar() {
           );
         })}
       </View>
+      </Panel>
 
       <ScheduleMailSheet visible={mailOpen} onClose={() => setMailOpen(false)} />
     </Screen>
@@ -130,14 +133,14 @@ export default function Calendar() {
 }
 
 const styles = StyleSheet.create({
+  panel: { padding: spacing.xxl },
   weekHead: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xl,
-    marginTop: -spacing.lg,
     marginBottom: spacing.xl,
   },
-  todayBtn: { paddingHorizontal: spacing.md, height: 30, justifyContent: 'center', borderRadius: radius.sm, backgroundColor: colors.surface },
+  todayBtn: { ...elevation.raised, paddingHorizontal: spacing.md, height: 30, justifyContent: 'center', borderRadius: radius.sm, backgroundColor: colors.surface },
   days: { gap: 32, paddingBottom: spacing.xxl },
   day: {
     width: 90,
@@ -162,6 +165,7 @@ const styles = StyleSheet.create({
   hourLabel: { width: 90, fontSize: 16, paddingLeft: 3 },
   events: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 24, alignItems: 'center' },
   event: {
+    ...elevation.raised,
     height: 40,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.md,

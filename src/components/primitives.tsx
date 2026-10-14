@@ -14,7 +14,7 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { colors, fonts, radius, spacing, type, TypeVariant } from '@/theme';
+import { colors, elevation, fonts, radius, spacing, type, TypeVariant } from '@/theme';
 
 // ---------- Text ----------
 
@@ -200,7 +200,7 @@ export function Segmented<V extends string>({ options, value, onChange }: {
           onPress={() => onChange(o)}
           style={({ hovered }) => [
             styles.segment,
-            o === value ? { backgroundColor: colors.selected } : hovered && { backgroundColor: colors.surfaceHover },
+            o === value ? { backgroundColor: colors.selected } : hovered && { backgroundColor: colors.tileHover },
           ]}
         >
           <T variant="small">{o}</T>
@@ -214,6 +214,7 @@ export const webInputReset = webNoOutline;
 
 const styles = StyleSheet.create({
   pill: {
+    ...elevation.raised,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm + 2,
@@ -242,6 +243,7 @@ const styles = StyleSheet.create({
   status: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
   input: {
+    ...elevation.raised,
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     paddingHorizontal: spacing.lg,
@@ -253,7 +255,7 @@ const styles = StyleSheet.create({
   inputMultiline: { height: 140, paddingTop: spacing.md, textAlignVertical: 'top' },
   segmented: {
     flexDirection: 'row',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.tile,
     borderRadius: radius.md,
     padding: 3,
     gap: 2,

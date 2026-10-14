@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { DeleteButton } from '@/components/ConfirmButton';
 import { EmptyState, Field, Hoverable, Input, PillButton, T } from '@/components/primitives';
+import { Panel } from '@/components/Panel';
 import { Screen, useLayout } from '@/components/Screen';
 import { Sheet } from '@/components/Sheet';
 import { TaskRow } from '@/components/TaskRow';
@@ -50,7 +51,7 @@ export default function Tasks() {
       actions={<PillButton icon={Plus} label="New Task" onPress={() => openNewTask()} />}
     >
       <View style={[styles.columns, !split && { flexDirection: 'column' }]}>
-        <View style={[styles.listCol, split && { maxWidth: 566 }]}>
+        <Panel style={[styles.listCol, split && { maxWidth: 600 }]}>
           <View style={styles.stats}>
             <Stat value={todays.length} label={'Tasks\nToday'} />
             <Stat value={completed.length} label={'Tasks\nCompleted'} onPress={() => setShowCompleted((s) => !s)} />
@@ -79,15 +80,15 @@ export default function Tasks() {
             </T>
           </Hoverable>
           {showCompleted && <View style={[styles.list, { marginTop: spacing.lg }]}>{renderList(completed)}</View>}
-        </View>
+        </Panel>
 
-        <View style={styles.detailCol}>
+        <Panel style={styles.detailCol}>
           {selected ? (
             <TaskDetail task={selected} onEdit={() => setEditing(selected)} onDeleted={() => setSelectedId(todays[0]?.id)} />
           ) : (
             <EmptyState title="Select a task" />
           )}
-        </View>
+        </Panel>
       </View>
       <TaskEditSheet task={editing} onClose={() => setEditing(null)} />
     </Screen>
@@ -99,7 +100,7 @@ function Stat({ value, label, onPress }: { value: number; label: string; onPress
     <Hoverable onPress={onPress} disabled={!onPress} style={{ alignItems: 'center', gap: spacing.lg }}>
       {({ hovered }) => (
         <>
-          <View style={[styles.statBox, hovered && { backgroundColor: colors.surfaceHover }]}>
+          <View style={[styles.statBox, hovered && { backgroundColor: colors.tileHover }]}>
             <T variant="title" weight="regular">{value}</T>
           </View>
           <T variant="body" style={{ textAlign: 'center', fontSize: 16, lineHeight: 19 }}>{label}</T>
@@ -114,7 +115,7 @@ function TaskDetail({ task, onEdit, onDeleted }: { task: Task; onEdit: () => voi
   const client = clientById(task.clientId);
 
   return (
-    <View style={{ paddingTop: spacing.xxxl - 8 }}>
+    <View>
       <View style={styles.detailHead}>
         <View style={{ flex: 1 }}>
           <DetailBlock label="Task Title" value={task.title} />
@@ -190,19 +191,19 @@ function TaskEditSheet({ task, onClose }: { task: Task | null; onClose: () => vo
 }
 
 const styles = StyleSheet.create({
-  columns: { flexDirection: 'row', gap: 150, marginTop: -spacing.sm },
+  columns: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
   listCol: { flex: 1.1 },
-  detailCol: { flex: 1, minWidth: 300 },
+  detailCol: { flex: 1, minWidth: 300, padding: spacing.xxl },
   stats: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xxxl - 8 },
   statBox: {
     width: 78,
     height: 72,
     borderRadius: radius.lg,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.tile,
     alignItems: 'center',
     justifyContent: 'center',
   },
   group: { marginBottom: spacing.lg },
-  list: { gap: 8 },
+  list: { gap: 10 },
   detailHead: { flexDirection: 'row', gap: spacing.lg },
 });

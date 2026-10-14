@@ -8,6 +8,7 @@ import {
   Bullet, EmptyState, Field, Hoverable, IconButton, Input, LinkText, PillButton,
   Segmented, StatusBadge, T, webInputReset,
 } from '@/components/primitives';
+import { Panel } from '@/components/Panel';
 import { Screen, useLayout } from '@/components/Screen';
 import { Sheet } from '@/components/Sheet';
 import type { Client, ClientStatus } from '@/data/mock';
@@ -52,7 +53,7 @@ export default function Clients() {
       actions={<PillButton icon={Plus} label="New Client" onPress={() => setEditing('new')} />}
     >
       <View style={[styles.columns, !split && { flexDirection: 'column' }]}>
-        <View style={[styles.listCol, split && { maxWidth: 566 }]}>
+        <Panel style={[styles.listCol, split && { maxWidth: 600 }]}>
           <View style={styles.search}>
             <Search size={18} color={colors.text} strokeWidth={1.6} />
             <TextInput
@@ -92,9 +93,9 @@ export default function Clients() {
               );
             })}
           </View>
-        </View>
+        </Panel>
 
-        <View style={styles.detailCol}>
+        <Panel style={styles.detailCol}>
           {selected ? (
             <ClientDetail
               client={selected}
@@ -107,7 +108,7 @@ export default function Clients() {
           ) : (
             <EmptyState title="Select a client" hint="Details, tasks and emails appear here" />
           )}
-        </View>
+        </Panel>
       </View>
 
       <ClientForm
@@ -282,9 +283,9 @@ function ClientForm({ initial, onClose, onCreated }: {
 }
 
 const styles = StyleSheet.create({
-  columns: { flexDirection: 'row', gap: 69, marginTop: -spacing.sm },
+  columns: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
   listCol: { flex: 1.1 },
-  detailCol: { flex: 1, minWidth: 320 },
+  detailCol: { flex: 1, minWidth: 320, padding: spacing.xxl },
   search: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   searchInput: { flex: 1, height: '100%', fontFamily: fonts.regular, fontSize: 14, color: colors.text },
-  list: { gap: 8, marginTop: 40 },
+  list: { gap: 10, marginTop: spacing.xl },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

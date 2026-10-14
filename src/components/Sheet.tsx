@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   card: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.panel,
     borderRadius: radius.xl,
     overflow: 'hidden',
     shadowColor: '#000',
