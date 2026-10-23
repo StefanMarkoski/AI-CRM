@@ -1,19 +1,21 @@
 import { useLocalSearchParams } from 'expo-router';
-import { Check, Pencil, Plus, RotateCcw } from 'lucide-react-native';
+import { Check, Mail, Pencil, Plus, RotateCcw, X } from 'lucide-react-native';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { DeleteButton } from '@/components/ConfirmButton';
 import { EmptyState, Field, Hoverable, Input, PillButton, T } from '@/components/primitives';
+import { ScheduleMailSheet } from '@/components/ScheduleMailSheet';
 import { Panel } from '@/components/Panel';
 import { Screen, useLayout } from '@/components/Screen';
 import { Sheet } from '@/components/Sheet';
-import { TaskRow } from '@/components/TaskRow';
+import { StatTile } from '@/components/StatTile';
+import { TaskColumns, TaskRow } from '@/components/TaskRow';
 import type { Task } from '@/data/mock';
 import { useOnChange } from '@/hooks/useOnChange';
 import { useCrm } from '@/store/crm';
 import { useUi } from '@/store/ui';
-import { colors, radius, spacing } from '@/theme';
+import { colors, spacing } from '@/theme';
 import { formatLongDate, formatTime, isSameDay } from '@/utils/dates';
 
 export default function Tasks() {
@@ -39,10 +41,23 @@ export default function Tasks() {
 
   const selected = tasks.find((t) => t.id === selectedId);
 
-  const renderList = (list: Task[]) =>
-    list.map((t) => (
-      <TaskRow key={t.id} task={t} showDate selected={t.id === selectedId} onPress={() => setSelectedId(t.id)} />
-    ));
+  const renderList = (list: Task[], showDate = true) => (
+    <>
+      <TaskColumns showContact showDate={showDate} />
+      <View style={styles.list}>
+        {list.map((t) => (
+          <TaskRow
+            key={t.id}
+            task={t}
+            showContact
+            showDate={showDate}
+            selected={t.id === selectedId}
+            onPress={() => setSelectedId(t.id)}
+          />
+        ))}
+      </View>
+    </>
+  );
 
   return (
     <Screen
@@ -51,35 +66,36 @@ export default function Tasks() {
       actions={<PillButton icon={Plus} label="New Task" onPress={() => openNewTask()} />}
     >
       <View style={[styles.columns, !split && { flexDirection: 'column' }]}>
-        <Panel style={[styles.listCol, split && { maxWidth: 600 }]}>
+        <Panel style={[styles.listCol, split && { maxWidth: 780 }]}>
           <View style={styles.stats}>
-            <Stat value={todays.length} label={'Tasks\nToday'} />
-            <Stat value={completed.length} label={'Tasks\nCompleted'} onPress={() => setShowCompleted((s) => !s)} />
-            <Stat value={overdue.length} label={'Tasks\nOverdue'} />
+            <StatTile value={todays.length} label={'Tasks\nToday'} />
+            <StatTile value={completed.length} label={'Tasks\nCompleted'} onPress={() => setShowCompleted((s) => !s)} />
+            <StatTile value={overdue.length} label={'Tasks\nOverdue'} alert={overdue.length > 0} />
           </View>
 
           {overdue.length > 0 && (
-            <>
-              <T variant="subtitle" weight="regular" style={styles.group}>Overdue</T>
-              <View style={styles.list}>{renderList(overdue)}</View>
-            </>
+            <View style={styles.section}>
+              <T variant="body" color={colors.danger} style={styles.group}>Overdue</T>
+              {renderList(overdue)}
+            </View>
           )}
 
-          <T variant="subtitle" weight="regular" style={styles.group}>Tasks Today</T>
-          <View style={styles.list}>
-            {todays.length === 0 && <EmptyState title="All done for today" />}
-            {renderList(todays)}
+          <View style={styles.section}>
+            <T variant="body" style={styles.group}>Today</T>
+            {todays.length === 0 ? <EmptyState title="All done for today" /> : renderList(todays, false)}
           </View>
 
-          <T variant="subtitle" weight="regular" style={[styles.group, { marginTop: spacing.xxxl - 8 }]}>Upcoming Tasks</T>
-          <View style={styles.list}>{renderList(upcoming)}</View>
+          <View style={styles.section}>
+            <T variant="body" style={styles.group}>Upcoming</T>
+            {upcoming.length === 0 ? <EmptyState title="Nothing coming up" /> : renderList(upcoming)}
+          </View>
 
-          <Hoverable onPress={() => setShowCompleted((s) => !s)} style={{ marginTop: spacing.xxxl - 8 }}>
-            <T variant="subtitle" weight="regular" color={colors.textSecondary}>
+          <Hoverable onPress={() => setShowCompleted((s) => !s)} style={styles.section}>
+            <T variant="body" color={colors.textSecondary}>
               Completed ({completed.length}) {showCompleted ? '▾' : '▸'}
             </T>
           </Hoverable>
-          {showCompleted && <View style={[styles.list, { marginTop: spacing.lg }]}>{renderList(completed)}</View>}
+          {showCompleted && <View style={{ marginTop: spacing.lg }}>{renderList(completed)}</View>}
         </Panel>
 
         <Panel style={styles.detailCol}>
@@ -95,62 +111,48 @@ export default function Tasks() {
   );
 }
 
-function Stat({ value, label, onPress }: { value: number; label: string; onPress?: () => void }) {
-  return (
-    <Hoverable onPress={onPress} disabled={!onPress} style={{ alignItems: 'center', gap: spacing.lg }}>
-      {({ hovered }) => (
-        <>
-          <View style={[styles.statBox, hovered && { backgroundColor: colors.tileHover }]}>
-            <T variant="title" weight="regular">{value}</T>
-          </View>
-          <T variant="body" style={{ textAlign: 'center', fontSize: 16, lineHeight: 19 }}>{label}</T>
-        </>
-      )}
-    </Hoverable>
-  );
-}
-
 function TaskDetail({ task, onEdit, onDeleted }: { task: Task; onEdit: () => void; onDeleted: () => void }) {
   const { clientById, toggleTask, deleteTask } = useCrm();
+  const [mailOpen, setMailOpen] = useState(false);
   const client = clientById(task.clientId);
 
   return (
-    <View>
-      <View style={styles.detailHead}>
-        <View style={{ flex: 1 }}>
-          <DetailBlock label="Task Title" value={task.title} />
-          <DetailBlock label="Company" value={client?.company ?? '—'} />
-        </View>
-        <View style={{ gap: spacing.lg, alignItems: 'flex-end' }}>
-          <PillButton icon={Pencil} label="Edit" onPress={onEdit} />
-          <DeleteButton
-            onConfirm={() => {
-              deleteTask(task.id);
-              onDeleted();
-            }}
-          />
-        </View>
-      </View>
+    <View style={{ paddingTop: spacing.md }}>
+      <DetailBlock label="Task Title" value={task.title} />
+      <DetailBlock label="Company" value={client?.company ?? '—'} />
+      <DetailBlock label="Contact" value={client?.contactName ?? '—'} />
       <DetailBlock label="Due" value={`${formatLongDate(task.due)} · ${formatTime(task.due)}`} />
       <DetailBlock label="Notes" value={task.notes || '—'} />
       <DetailBlock label="Created" value={`${formatLongDate(task.created)} · ${formatTime(task.created)}`} />
-      <View style={{ alignItems: 'flex-start', marginTop: spacing.sm }}>
+
+      <View style={styles.actions}>
         <PillButton
           icon={task.completed ? RotateCcw : Check}
           label={task.completed ? 'Mark as Open' : 'Mark as Completed'}
           active={task.completed}
           onPress={() => toggleTask(task.id)}
         />
+        <PillButton icon={Mail} label="Send Mail" onPress={() => setMailOpen(true)} />
+        <View style={styles.actionRow}>
+          <DeleteButton
+            onConfirm={() => {
+              deleteTask(task.id);
+              onDeleted();
+            }}
+          />
+          <PillButton icon={Pencil} label="Edit" onPress={onEdit} />
+        </View>
       </View>
+      <ScheduleMailSheet visible={mailOpen} onClose={() => setMailOpen(false)} preset={{ clientId: task.clientId }} />
     </View>
   );
 }
 
 function DetailBlock({ label, value }: { label: string; value: string }) {
   return (
-    <View style={{ marginBottom: spacing.xxl - 2 }}>
-      <T variant="title">{label}</T>
-      <T variant="body" color={colors.textSecondary} style={{ marginTop: spacing.md, fontSize: 16 }}>{value}</T>
+    <View style={{ marginBottom: spacing.xl + 4 }}>
+      <T variant="title" weight="regular">{label}</T>
+      <T variant="body" color={colors.textMuted} style={{ marginTop: spacing.sm, fontSize: 16 }}>{value}</T>
     </View>
   );
 }
@@ -179,31 +181,25 @@ function TaskEditSheet({ task, onClose }: { task: Task | null; onClose: () => vo
       onClose={onClose}
       footer={
         <>
-          <PillButton label="Cancel" onPress={onClose} />
-          <PillButton label="Save" active onPress={save} />
+          <PillButton icon={Check} label="Save Changes" disabled={!title.trim()} onPress={save} />
+          <PillButton icon={X} label="Cancel" onPress={onClose} />
         </>
       }
     >
-      <Field label="Title"><Input value={title} onChangeText={setTitle} autoFocus /></Field>
-      <Field label="Notes"><Input value={notes} onChangeText={setNotes} multiline style={{ height: 100 }} /></Field>
+      <Field label="Task Title:"><Input value={title} onChangeText={setTitle} autoFocus /></Field>
+      <Field label="Notes"><Input value={notes} onChangeText={setNotes} multiline style={{ height: 110 }} /></Field>
     </Sheet>
   );
 }
 
 const styles = StyleSheet.create({
-  columns: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
-  listCol: { flex: 1.1 },
-  detailCol: { flex: 1, minWidth: 300, padding: spacing.xxl },
-  stats: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xxxl - 8 },
-  statBox: {
-    width: 78,
-    height: 72,
-    borderRadius: radius.lg,
-    backgroundColor: colors.tile,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  group: { marginBottom: spacing.lg },
-  list: { gap: 10 },
-  detailHead: { flexDirection: 'row', gap: spacing.lg },
+  columns: { flexDirection: 'row', gap: 16, alignItems: 'flex-start' },
+  listCol: { flex: 1.25 },
+  detailCol: { flex: 1, minWidth: 300, padding: spacing.xl, alignSelf: 'stretch' },
+  stats: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 70, marginBottom: spacing.md },
+  section: { marginTop: spacing.xxl },
+  group: { fontSize: 16, marginBottom: spacing.lg },
+  list: { gap: 16, marginTop: spacing.md },
+  actions: { alignItems: 'flex-start', gap: spacing.lg, marginTop: spacing.xxl },
+  actionRow: { flexDirection: 'row', gap: spacing.lg },
 });

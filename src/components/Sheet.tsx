@@ -1,36 +1,37 @@
-import { X } from 'lucide-react-native';
 import { ReactNode } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
-import { colors, radius, spacing } from '@/theme';
+import { colors, elevation, radius, spacing } from '@/theme';
 
-import { IconButton, T } from './primitives';
+import { T } from './primitives';
 
 interface SheetProps {
   visible: boolean;
   title: string;
   onClose: () => void;
   children: ReactNode;
+  /** Left-aligned action row; push an item right with `<View style={{ flex: 1 }} />`. */
   footer?: ReactNode;
   width?: number;
 }
 
-/** Centered modal card used for create / edit forms. */
-export function Sheet({ visible, title, onClose, children, footer, width = 520 }: SheetProps) {
+/** Centered modal card used for create / edit forms. Backdrop tap and Esc close it. */
+export function Sheet({ visible, title, onClose, children, footer, width = 640 }: SheetProps) {
   const { width: screenW, height: screenH } = useWindowDimensions();
+  const narrow = screenW < 640;
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Close" />
         <View style={[styles.card, { width: Math.min(width, screenW - 32), maxHeight: screenH - 64 }]}>
-          <View style={styles.head}>
-            <T variant="title">{title}</T>
-            <IconButton icon={X} label="Close" onPress={onClose} />
-          </View>
-          <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
+          <ScrollView
+            contentContainerStyle={[styles.body, narrow && { padding: spacing.xl }]}
+            keyboardShouldPersistTaps="handled"
+          >
+            <T variant="title" weight="regular" style={styles.title}>{title}</T>
             {children}
+            {footer && <View style={styles.footer}>{footer}</View>}
           </ScrollView>
-          {footer && <View style={styles.footer}>{footer}</View>}
         </View>
       </View>
     </Modal>
@@ -45,31 +46,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   card: {
+    ...elevation.overlay,
     backgroundColor: colors.panel,
     borderRadius: radius.xl,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 40,
-    shadowOffset: { width: 0, height: 16 },
-    elevation: 12,
   },
-  head: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.md,
-  },
-  body: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xl, gap: spacing.lg },
+  title: { fontSize: 26, letterSpacing: -0.3, marginBottom: spacing.sm },
+  body: { padding: spacing.xxl, gap: spacing.lg },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: spacing.md,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.divider,
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: spacing.xl,
+    marginTop: spacing.lg,
   },
 });

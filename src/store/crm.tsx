@@ -27,6 +27,7 @@ interface CrmState {
   updateTemplate: (id: string, patch: Partial<Template>) => void;
   deleteTemplate: (id: string) => void;
   scheduleEmail: (e: Pick<Email, 'clientId' | 'subject' | 'at'>) => void;
+  sendEmail: (e: Pick<Email, 'clientId' | 'subject'>) => void;
   markAllNotificationsRead: () => void;
   toggleNotificationRead: (id: string) => void;
 }
@@ -99,6 +100,10 @@ export function CrmProvider({ children }: { children: ReactNode }) {
     setEmails((prev) => [...prev, { ...e, id: uid('e'), direction: 'out', scheduled: true }]);
   }, []);
 
+  const sendEmail = useCallback((e: Pick<Email, 'clientId' | 'subject'>) => {
+    setEmails((prev) => [...prev, { ...e, id: uid('e'), direction: 'out', at: new Date() }]);
+  }, []);
+
   const markAllNotificationsRead = useCallback(() => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   }, []);
@@ -114,14 +119,14 @@ export function CrmProvider({ children }: { children: ReactNode }) {
       clientById, addClient, updateClient, deleteClient, addNote,
       addTask, updateTask, toggleTask, deleteTask,
       addTemplate, updateTemplate, deleteTemplate,
-      scheduleEmail, markAllNotificationsRead, toggleNotificationRead,
+      scheduleEmail, sendEmail, markAllNotificationsRead, toggleNotificationRead,
     }),
     [
       clients, tasks, templates, notifications, emails,
       clientById, addClient, updateClient, deleteClient, addNote,
       addTask, updateTask, toggleTask, deleteTask,
       addTemplate, updateTemplate, deleteTemplate,
-      scheduleEmail, markAllNotificationsRead, toggleNotificationRead,
+      scheduleEmail, sendEmail, markAllNotificationsRead, toggleNotificationRead,
     ],
   );
 

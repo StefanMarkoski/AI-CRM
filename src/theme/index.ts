@@ -1,36 +1,42 @@
-// Palette sampled from the mockups: AI-CRM-1..5 (structure) and
-// CRM-AI-NEW-LOOK (frosted glass panels over a soft gray→mint gradient).
+// Palette sampled from the "CRM AI" lavender mockups (Desktop 1–13):
+// frosted panels over a soft gray→lavender gradient, lavender for selection.
 export const colors = {
-  background: '#F8F8F6', // fallback canvas
-  panel: '#EEF3F1', // opaque glass tone (modals, drawers)
-  glass: 'rgba(243, 246, 244, 0.78)', // translucent panels
-  glassBorder: 'rgba(255, 255, 255, 0.7)',
-  sidebar: 'rgba(242, 246, 245, 0.88)', // navigation rail
-  surface: '#F6F6F6', // raised rows, buttons, inputs, chips
-  surfaceHover: '#ECEEEC',
-  tile: '#E8E8E8', // stat tiles, day buttons
-  tileHover: '#DEDEDC',
-  selected: '#A4A4A4', // active nav item / selected row
-  selectedHover: '#999999',
-  outline: '#CBD0CF', // card outlines
-  text: '#171717',
+  background: '#E6E4EA', // fallback canvas
+  panel: '#E9E6F0', // opaque glass tone (modals, drawers)
+  glass: 'rgba(238, 236, 243, 0.72)', // translucent panels
+  glassBorder: 'rgba(255, 255, 255, 0.55)',
+  sidebar: 'rgba(236, 233, 241, 0.92)', // navigation rail
+  surface: '#F6F6F6', // raised rows, buttons, inputs, tiles
+  surfaceHover: '#EEECF2',
+  tile: '#F6F6F6', // stat tiles, day buttons
+  tileHover: '#EEECF2',
+  track: '#D9D9D9', // chip / segmented track inside forms
+  accent: '#BFA4F4', // active nav item, chosen chips
+  accentHover: '#B396F0',
+  selected: '#D9CBFB', // selected row / card / tab
+  selectedHover: '#CFBDF8',
+  outline: 'rgba(150, 128, 205, 0.35)', // card outlines
+  danger: '#E5383B',
+  dangerSoft: '#FCE4E4',
+  avatar: '#6B6B6B',
+  text: '#1A1A1A',
   textSecondary: '#4F4F4F',
-  textMuted: '#808080',
-  divider: '#D6DAD8',
-  overlay: 'rgba(23, 35, 33, 0.25)',
+  textMuted: '#7E7C84',
+  divider: 'rgba(80, 70, 100, 0.28)',
+  overlay: 'rgba(40, 30, 70, 0.22)',
   white: '#FFFFFF',
 } as const;
 
-// Background gradient: gray top-left → mint bottom-right, with a light glow top-right.
+// Background gradient: light gray top-left → lavender, with a pale glow top-right.
 export const gradient = {
-  base: ['#DADFDE', '#C6E9E5', '#B4EFE7'] as const,
-  glow: ['rgba(246, 249, 247, 0.9)', 'rgba(246, 249, 247, 0)'] as const,
+  base: ['#E3E2E6', '#D9CAF8', '#CDB8F3'] as const,
+  glow: ['rgba(246, 245, 248, 0.75)', 'rgba(246, 245, 248, 0)'] as const,
 };
 
 export const elevation = {
-  raised: { boxShadow: '0px 1px 2px rgba(23, 23, 23, 0.06), 0px 3px 10px rgba(23, 23, 23, 0.04)' },
-  panel: { boxShadow: '0px 10px 30px rgba(30, 70, 65, 0.08)' },
-  overlay: { boxShadow: '0px 18px 50px rgba(23, 35, 33, 0.18)' },
+  raised: { boxShadow: '0px 2px 4px rgba(40, 30, 70, 0.10), 0px 4px 12px rgba(40, 30, 70, 0.06)' },
+  panel: { boxShadow: '0px 10px 30px rgba(70, 50, 130, 0.08)' },
+  overlay: { boxShadow: '0px 18px 50px rgba(40, 30, 70, 0.20)' },
 } as const;
 
 export const fonts = {
@@ -42,7 +48,7 @@ export const fonts = {
 export const radius = {
   sm: 8,
   md: 12,
-  lg: 16,
+  lg: 14,
   xl: 20,
   pill: 999,
 } as const;

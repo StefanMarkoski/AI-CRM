@@ -1,10 +1,10 @@
 import { useLocalSearchParams } from 'expo-router';
-import { Mail, Pencil, Plus } from 'lucide-react-native';
+import { Atom, Check, Mail, Pencil, Plus, Trash2, X } from 'lucide-react-native';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { DeleteButton } from '@/components/ConfirmButton';
-import { EmptyState, Field, Hoverable, Input, PillButton, T } from '@/components/primitives';
+import { EmptyState, Field, Hoverable, IconButton, Input, PillButton, T } from '@/components/primitives';
 import { ScheduleMailSheet } from '@/components/ScheduleMailSheet';
 import { Panel } from '@/components/Panel';
 import { Screen, useLayout } from '@/components/Screen';
@@ -14,6 +14,7 @@ import { useOnChange } from '@/hooks/useOnChange';
 import { useCrm } from '@/store/crm';
 import { colors, elevation, radius, spacing } from '@/theme';
 import { timeAgo } from '@/utils/dates';
+import { draftTemplate, thinkingDelay } from '@/utils/mockAI';
 
 // Show the default sample contact in previews so templates read naturally.
 const sample = (s: string) => s.replace(/{{firstName}}/g, 'Marko').replace(/{{company}}/g, 'ABC Packaging');
@@ -31,6 +32,10 @@ export default function Templates() {
   });
 
   const selected = templates.find((t) => t.id === selectedId);
+  const remove = (id: string) => {
+    deleteTemplate(id);
+    if (id === selectedId) setSelectedId(templates.find((t) => t.id !== id)?.id);
+  };
 
   return (
     <Screen
@@ -40,49 +45,35 @@ export default function Templates() {
     >
       <View style={[styles.columns, !split && { flexDirection: 'column' }]}>
         <Panel style={styles.gridCol}>
-          <T variant="title" style={{ marginBottom: spacing.xl }}>Templates</T>
+          <T variant="title" weight="regular" style={{ marginBottom: spacing.xl }}>Templates</T>
           <View style={styles.grid}>
-            {templates.map((t) => {
-              const active = t.id === selectedId;
-              return (
-                <Hoverable key={t.id} onPress={() => setSelectedId(t.id)} style={styles.card}>
-                  {({ hovered }) => (
-                    <>
-                      <T variant="subtitle" weight="regular">{t.name}</T>
-                      <T variant="small" color={colors.textSecondary} style={{ marginTop: 6, marginBottom: spacing.md }}>
-                        Updated {timeAgo(t.updated)}
-                      </T>
-                      <View
-                        style={[
-                          styles.preview,
-                          { backgroundColor: active ? colors.selected : hovered ? colors.surfaceHover : colors.surface },
-                        ]}
-                      >
-                        <T variant="caption" numberOfLines={6} style={{ lineHeight: 15 }}>{sample(t.body)}</T>
-                      </View>
-                    </>
-                  )}
-                </Hoverable>
-              );
-            })}
+            {templates.map((t) => (
+              <TemplateCard
+                key={t.id}
+                template={t}
+                active={t.id === selectedId}
+                onPress={() => setSelectedId(t.id)}
+                onEdit={() => setEditing(t)}
+                onDelete={() => remove(t.id)}
+                onSend={() => {
+                  setSelectedId(t.id);
+                  setSendOpen(true);
+                }}
+              />
+            ))}
           </View>
         </Panel>
 
         <Panel style={styles.detailCol}>
           {selected ? (
             <View style={{ gap: spacing.lg }}>
-              <T variant="title" weight="semibold">{selected.name}</T>
+              <T variant="title" weight="regular">{selected.name}</T>
               <T variant="body" style={{ fontSize: 16, marginTop: spacing.sm }}>Subject: {sample(selected.subject)}</T>
               <T variant="body" style={{ fontSize: 16 }}>Message:</T>
               <T variant="label" style={{ lineHeight: 20, marginTop: -6 }}>{sample(selected.body)}</T>
               <View style={styles.actions}>
                 <PillButton icon={Pencil} label="Edit" onPress={() => setEditing(selected)} />
-                <DeleteButton
-                  onConfirm={() => {
-                    deleteTemplate(selected.id);
-                    setSelectedId(templates.find((t) => t.id !== selected.id)?.id);
-                  }}
-                />
+                <DeleteButton onConfirm={() => remove(selected.id)} />
                 <PillButton icon={Mail} label="Send Mail" onPress={() => setSendOpen(true)} />
               </View>
               <T variant="caption" color={colors.textMuted}>
@@ -101,6 +92,41 @@ export default function Templates() {
   );
 }
 
+function TemplateCard({ template: t, active, onPress, onEdit, onDelete, onSend }: {
+  template: Template; active: boolean;
+  onPress: () => void; onEdit: () => void; onDelete: () => void; onSend: () => void;
+}) {
+  const [armed, setArmed] = useState(false);
+  return (
+    <Hoverable
+      onPress={onPress}
+      accessibilityLabel={t.name}
+      style={({ hovered }) => [
+        styles.card,
+        { backgroundColor: active ? colors.selected : hovered ? colors.surfaceHover : colors.surface },
+      ]}
+    >
+      <T variant="subtitle" weight="regular" style={{ fontSize: 16 }}>{t.name}</T>
+      <T variant="small" color={colors.textMuted} style={{ marginTop: 6, marginBottom: spacing.xl }}>
+        Updated {timeAgo(t.updated)}
+      </T>
+      <View style={styles.cardBody}>
+        <T variant="caption" style={{ fontSize: 10.5, lineHeight: 15 }}>{sample(t.body)}</T>
+      </View>
+      <View style={styles.cardActions}>
+        <IconButton icon={Pencil} label={`Edit ${t.name}`} onPress={onEdit} />
+        <IconButton
+          icon={armed ? Check : Trash2}
+          color={armed ? colors.danger : colors.text}
+          label={armed ? `Confirm delete ${t.name}` : `Delete ${t.name}`}
+          onPress={() => (armed ? onDelete() : setArmed(true))}
+        />
+        <IconButton icon={Mail} label={`Send ${t.name}`} onPress={onSend} />
+      </View>
+    </Hoverable>
+  );
+}
+
 function TemplateForm({ initial, onClose, onCreated }: {
   initial: Template | 'new' | null; onClose: () => void; onCreated: (t: Template) => void;
 }) {
@@ -108,6 +134,7 @@ function TemplateForm({ initial, onClose, onCreated }: {
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [drafting, setDrafting] = useState(false);
 
   useOnChange(initial, (next) => {
     const t = next && next !== 'new' ? next : null;
@@ -117,6 +144,14 @@ function TemplateForm({ initial, onClose, onCreated }: {
   });
 
   const valid = name.trim() && subject.trim();
+  const aiDraft = () => {
+    if (drafting) return;
+    setDrafting(true);
+    setTimeout(() => {
+      setBody(draftTemplate(name, subject));
+      setDrafting(false);
+    }, thinkingDelay());
+  };
   const save = () => {
     if (!valid) return;
     if (initial === 'new') onCreated(addTemplate({ name, subject, body }));
@@ -129,27 +164,38 @@ function TemplateForm({ initial, onClose, onCreated }: {
       visible={!!initial}
       title={initial === 'new' ? 'New Template' : 'Edit Template'}
       onClose={onClose}
-      width={620}
       footer={
         <>
-          <PillButton label="Cancel" onPress={onClose} />
-          <PillButton label="Save Template" active={!!valid} onPress={save} />
+          <PillButton icon={Check} label={initial === 'new' ? 'Create New Template' : 'Save Changes'} disabled={!valid} onPress={save} />
+          <PillButton icon={X} label="Cancel" onPress={onClose} />
+          <View style={{ flex: 1 }} />
+          <PillButton icon={Atom} label={drafting ? 'Drafting…' : 'Ai Draft'} onPress={aiDraft} />
         </>
       }
     >
-      <Field label="Name"><Input value={name} onChangeText={setName} autoFocus /></Field>
-      <Field label="Subject"><Input value={subject} onChangeText={setSubject} /></Field>
-      <Field label="Message"><Input value={body} onChangeText={setBody} multiline style={{ height: 220 }} /></Field>
+      <Field label="Name:"><Input value={name} onChangeText={setName} autoFocus /></Field>
+      <Field label="Subject:"><Input value={subject} onChangeText={setSubject} /></Field>
+      <Field label="Message:"><Input value={body} onChangeText={setBody} multiline style={{ height: 204 }} /></Field>
     </Sheet>
   );
 }
 
 const styles = StyleSheet.create({
-  columns: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
-  gridCol: { flexShrink: 1, padding: spacing.xxl },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 24, rowGap: 28, maxWidth: 488 },
-  card: { width: 220 },
-  preview: { ...elevation.raised, height: 120, borderRadius: radius.lg, paddingHorizontal: spacing.lg, paddingVertical: spacing.lg },
-  detailCol: { flex: 1, minWidth: 300, padding: spacing.xxl },
+  columns: { flexDirection: 'row', gap: 16, alignItems: 'flex-start' },
+  gridCol: { flexShrink: 1, padding: spacing.xl, alignSelf: 'stretch' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, maxWidth: 616 },
+  card: {
+    ...elevation.raised,
+    width: 300,
+    maxWidth: '100%',
+    height: 249,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.xl + 4,
+    paddingBottom: spacing.lg,
+  },
+  cardBody: { height: 75, overflow: 'hidden', marginBottom: 'auto' },
+  cardActions: { flexDirection: 'row', gap: spacing.xl, marginTop: spacing.md },
+  detailCol: { flex: 1, minWidth: 300, padding: spacing.xl, alignSelf: 'stretch' },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xl, marginTop: spacing.lg },
 });

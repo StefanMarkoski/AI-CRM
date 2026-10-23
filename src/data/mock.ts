@@ -236,3 +236,13 @@ export const notifications: Notification[] = [
 
 // Number of unread inbox emails shown on the dashboard
 export const NEW_EMAIL_COUNT = 5;
+
+// AI usage this billing period, shown on the dashboard
+export const AI_USAGE = {
+  limit: 500,
+  breakdown: [
+    { label: 'Email drafts', count: 142 },
+    { label: 'Personalizations', count: 87 },
+    { label: 'Chat questions', count: 64 },
+  ],
+};

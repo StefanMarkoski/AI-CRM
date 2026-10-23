@@ -17,7 +17,7 @@ export function DeleteButton({ onConfirm, label = 'Delete' }: { onConfirm: () =>
     <PillButton
       icon={Trash2}
       label={armed ? 'Confirm?' : label}
-      active={armed}
+      danger={armed}
       onPress={() => (armed ? onConfirm() : setArmed(true))}
     />
   );

@@ -13,7 +13,7 @@ import {
 import { StyleSheet, View } from 'react-native';
 
 import { useCrm } from '@/store/crm';
-import { colors, elevation, radius, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 
 import { glassBlur } from './Panel';
 import { Hoverable, T } from './primitives';
@@ -52,37 +52,26 @@ export function Sidebar({ collapsed }: { collapsed: boolean }) {
         key={item.label}
         onPress={() => router.navigate(item.href)}
         accessibilityRole="link"
-        accessibilityLabel={item.label}
+        accessibilityLabel={badge > 0 ? `${item.label}, ${badge} unread` : item.label}
         style={({ hovered }) => [
           styles.item,
           collapsed && styles.itemCollapsed,
           active
-            ? { backgroundColor: colors.selected }
-            : hovered && { backgroundColor: 'rgba(0,0,0,0.05)' },
+            ? { backgroundColor: colors.accent }
+            : hovered && { backgroundColor: 'rgba(191, 164, 244, 0.25)' },
         ]}
       >
         <View>
-          <item.icon size={19} color={colors.text} strokeWidth={1.5} />
-          {badge > 0 && collapsed && <View style={styles.badgeDot} />}
+          <item.icon size={20} color={colors.text} strokeWidth={1.4} />
+          {badge > 0 && <View style={styles.badgeDot} />}
         </View>
-        {!collapsed && <T variant="label" style={{ flex: 1 }}>{item.label}</T>}
-        {!collapsed && badge > 0 && (
-          <View style={styles.badge}>
-            <T variant="caption" color={colors.white} weight="medium">{badge}</T>
-          </View>
-        )}
+        {!collapsed && <T variant="label" numberOfLines={1} style={{ fontSize: 14.5 }}>{item.label}</T>}
       </Hoverable>
     );
   };
 
   return (
     <View style={[styles.rail, glassBlur, collapsed && styles.railCollapsed]}>
-      <View style={[styles.brand, collapsed && { alignItems: 'center', paddingLeft: 0 }]}>
-        <View style={styles.logo}>
-          <Atom size={16} color={colors.background} strokeWidth={1.8} />
-        </View>
-        {!collapsed && <T variant="subtitle" weight="semibold">CRM AI</T>}
-      </View>
       <View style={styles.group}>{MAIN.map(renderItem)}</View>
       <View style={[styles.group, { marginTop: 'auto' }]}>{FOOTER.map(renderItem)}</View>
     </View>
@@ -91,54 +80,27 @@ export function Sidebar({ collapsed }: { collapsed: boolean }) {
 
 const styles = StyleSheet.create({
   rail: {
-    width: 187,
+    width: 188,
     backgroundColor: colors.sidebar,
-    borderRightWidth: 1,
-    borderColor: colors.glassBorder,
-    ...elevation.panel,
+    boxShadow: '4px 0px 24px rgba(70, 50, 130, 0.14)',
     borderTopRightRadius: radius.xl,
     borderBottomRightRadius: radius.xl,
-    paddingHorizontal: 23,
-    paddingTop: 32,
-    paddingBottom: 24,
+    paddingHorizontal: 22,
+    paddingTop: 120,
+    paddingBottom: 120,
   },
-  railCollapsed: { width: 72, paddingHorizontal: 12 },
-  brand: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm + 2,
-    height: 40,
-    paddingLeft: spacing.md,
-    marginBottom: 44,
-  },
-  logo: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: colors.text,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  railCollapsed: { width: 72, paddingHorizontal: 12, paddingTop: 40, paddingBottom: 24 },
   group: { gap: 16 },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 11,
     height: 40,
-    paddingHorizontal: spacing.md + 4,
-    marginHorizontal: 0,
-    borderRadius: radius.md,
+    paddingHorizontal: spacing.md + 2,
+    alignSelf: 'flex-start',
+    borderRadius: radius.lg,
   },
-  itemCollapsed: { justifyContent: 'center', paddingHorizontal: 0 },
-  badge: {
-    minWidth: 20,
-    height: 20,
-    paddingHorizontal: 6,
-    borderRadius: 10,
-    backgroundColor: colors.text,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  itemCollapsed: { justifyContent: 'center', paddingHorizontal: 0, alignSelf: 'stretch' },
   badgeDot: {
     position: 'absolute',
     top: -2,
@@ -146,7 +108,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.text,
+    backgroundColor: colors.danger,
     borderWidth: 1.5,
     borderColor: colors.panel,
   },

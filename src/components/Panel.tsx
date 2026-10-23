@@ -18,10 +18,10 @@ export function Panel({ children, style, padded = true }: {
 const styles = StyleSheet.create({
   panel: {
     backgroundColor: colors.glass,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.glassBorder,
     ...elevation.panel,
   },
-  padded: { padding: spacing.xl - 2 },
+  padded: { padding: spacing.xl },
 });

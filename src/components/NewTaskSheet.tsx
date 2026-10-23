@@ -1,16 +1,17 @@
+import { CalendarDays, Check, Clock, X } from 'lucide-react-native';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { useOnChange } from '@/hooks/useOnChange';
 import { useCrm } from '@/store/crm';
 import { useUi } from '@/store/ui';
-import { colors, radius, spacing } from '@/theme';
-import { addDays, at, formatTime, relativeDay, startOfDay } from '@/utils/dates';
+import { spacing } from '@/theme';
+import { at, startOfDay } from '@/utils/dates';
+import { dayOptions, hourOptions, HOURS, matches } from '@/utils/pickers';
 
-import { Field, Hoverable, Input, PillButton, T } from './primitives';
+import { ChipGroup, Field, Input, PillButton } from './primitives';
+import { SelectField } from './SelectField';
 import { Sheet } from './Sheet';
-
-const HOURS = [9, 10, 11, 12, 13, 14, 15, 16, 17];
 
 /** Global "New Task" form, opened from Dashboard, Clients, Tasks, Calendar. */
 export function NewTaskSheet() {
@@ -18,26 +19,30 @@ export function NewTaskSheet() {
   const { clients, addTask } = useCrm();
 
   const [title, setTitle] = useState('');
+  const [clientQuery, setClientQuery] = useState('');
   const [clientId, setClientId] = useState('');
-  const [day, setDay] = useState(startOfDay(new Date()));
-  const [hour, setHour] = useState(10);
+  const [day, setDay] = useState<number | null>(null);
+  const [hour, setHour] = useState<number | null>(null);
   const [notes, setNotes] = useState('');
 
   useOnChange(newTaskFor, (preset) => {
     if (!preset) return;
     setTitle('');
     setNotes('');
-    setClientId(preset.clientId ?? clients[0]?.id ?? '');
-    setDay(startOfDay(preset.date ?? new Date()));
-    setHour(preset.date && preset.date.getHours() >= 9 ? preset.date.getHours() : 10);
+    setClientQuery('');
+    setClientId(preset.clientId ?? '');
+    setDay(startOfDay(preset.date ?? new Date()).getTime());
+    setHour(preset.date && HOURS.includes(preset.date.getHours()) ? preset.date.getHours() : 10);
   });
 
-  const days = Array.from({ length: 7 }, (_, i) => addDays(startOfDay(new Date()), i));
-  const canSave = title.trim().length > 0 && clientId;
+  const options = clients
+    .filter((c) => c.id === clientId || matches(clientQuery, c.company, c.contactName))
+    .map((c) => ({ key: c.id, label: c.company }));
+  const canSave = title.trim().length > 0 && !!clientId && day !== null && hour !== null;
 
   const save = () => {
     if (!canSave) return;
-    addTask({ title: title.trim(), clientId, due: at(day, hour), notes: notes.trim() });
+    addTask({ title: title.trim(), clientId, due: at(new Date(day), hour), notes: notes.trim() });
     closeNewTask();
   };
 
@@ -48,67 +53,34 @@ export function NewTaskSheet() {
       onClose={closeNewTask}
       footer={
         <>
-          <PillButton label="Cancel" onPress={closeNewTask} />
-          <PillButton label="Create Task" active={!!canSave} onPress={save} />
+          <PillButton icon={Check} label="Create New Task" disabled={!canSave} onPress={save} />
+          <PillButton icon={X} label="Cancel" onPress={closeNewTask} />
         </>
       }
     >
-      <Field label="Title">
+      <Field label="Task Title:">
         <Input value={title} onChangeText={setTitle} placeholder="e.g. Follow up about quotation" autoFocus onSubmitEditing={save} />
       </Field>
 
       <Field label="Client">
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-          {clients.map((c) => (
-            <Chip key={c.id} label={c.company} active={c.id === clientId} onPress={() => setClientId(c.id)} />
-          ))}
-        </ScrollView>
+        <Input value={clientQuery} onChangeText={setClientQuery} placeholder="Search clients…" />
+        <ChipGroup options={options} isActive={(k) => k === clientId} onToggle={setClientId} />
       </Field>
 
-      <Field label="Day">
-        <View style={styles.wrap}>
-          {days.map((d) => (
-            <Chip
-              key={d.toISOString()}
-              label={relativeDay(d)}
-              active={d.getTime() === day.getTime()}
-              onPress={() => setDay(d)}
-            />
-          ))}
-        </View>
-      </Field>
-
-      <Field label="Time">
-        <View style={styles.wrap}>
-          {HOURS.map((h) => (
-            <Chip key={h} label={formatTime(at(day, h))} active={h === hour} onPress={() => setHour(h)} />
-          ))}
+      <Field label="Schedule">
+        <View style={styles.row}>
+          <SelectField icon={CalendarDays} placeholder="Date" chevron options={dayOptions()} value={day} onChange={setDay} />
+          <SelectField icon={Clock} placeholder="Time" options={hourOptions} value={hour} onChange={setHour} />
         </View>
       </Field>
 
       <Field label="Notes">
-        <Input value={notes} onChangeText={setNotes} placeholder="Optional" multiline style={{ height: 90 }} />
+        <Input value={notes} onChangeText={setNotes} placeholder="Optional" />
       </Field>
     </Sheet>
   );
 }
 
-export function Chip({ label, active, onPress }: { label: string; active?: boolean; onPress?: () => void }) {
-  return (
-    <Hoverable
-      onPress={onPress}
-      style={({ hovered }) => [
-        styles.chip,
-        { backgroundColor: active ? colors.selected : hovered ? colors.surfaceHover : colors.surface },
-      ]}
-    >
-      <T variant="small">{label}</T>
-    </Hoverable>
-  );
-}
-
 const styles = StyleSheet.create({
-  chips: { gap: spacing.sm },
-  wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  chip: { height: 32, paddingHorizontal: spacing.md, borderRadius: radius.sm + 2, justifyContent: 'center' },
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.lg, alignItems: 'flex-start' },
 });

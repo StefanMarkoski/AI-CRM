@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    height: 46,
+    height: 49,
     paddingHorizontal: spacing.lg - 2,
     borderRadius: radius.md - 2,
     gap: spacing.md,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   check: {
     ...elevation.raised,
     width: CHECK,
-    height: 46,
+    height: 49,
     borderRadius: radius.md - 2,
     alignItems: 'center',
     justifyContent: 'center',

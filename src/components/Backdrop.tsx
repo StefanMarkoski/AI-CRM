@@ -3,13 +3,13 @@ import { StyleSheet } from 'react-native';
 
 import { gradient } from '@/theme';
 
-/** Full-screen gray→mint gradient that sits behind the glass UI. */
+/** Full-screen gray→lavender gradient that sits behind the glass UI. */
 export function Backdrop() {
   return (
     <>
       <LinearGradient
         colors={gradient.base}
-        locations={[0, 0.4, 1]}
+        locations={[0, 0.45, 1]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}

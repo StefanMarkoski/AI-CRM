@@ -48,7 +48,7 @@ export default function Calendar() {
     >
       <Panel style={styles.panel}>
       <View style={styles.weekHead}>
-        <T variant="title">{formatWeekRange(weekStart)}</T>
+        <T variant="title" weight="regular">{formatWeekRange(weekStart)}</T>
         <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
           <IconButton icon={ChevronLeft} label="Previous week" onPress={() => shiftWeek(-1)} />
           <Hoverable onPress={() => { setWeekStart(startOfWeek(today)); setDay(today); }} style={styles.todayBtn}>
@@ -106,13 +106,13 @@ export default function Calendar() {
                           t.completed && { opacity: 0.55 },
                         ]}
                       >
-                        <T variant="small" style={t.completed && { textDecorationLine: 'line-through' }}>{t.title}</T>
+                        <T variant="caption" style={t.completed && { textDecorationLine: 'line-through' }}>{t.title}</T>
                       </Hoverable>
                     ))}
                     {hourMails.map((e) => (
                       <View key={e.id} style={[styles.event, styles.mailEvent]}>
                         <Mail size={13} color={colors.textSecondary} strokeWidth={1.6} />
-                        <T variant="small" color={colors.textSecondary}>{e.subject}</T>
+                        <T variant="caption" color={colors.textSecondary}>{e.subject}</T>
                       </View>
                     ))}
                     {hovered && hourTasks.length + hourMails.length === 0 && (
@@ -127,13 +127,13 @@ export default function Calendar() {
       </View>
       </Panel>
 
-      <ScheduleMailSheet visible={mailOpen} onClose={() => setMailOpen(false)} />
+      <ScheduleMailSheet visible={mailOpen} onClose={() => setMailOpen(false)} preset={{ schedule: true }} />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  panel: { padding: spacing.xxl },
+  panel: { padding: spacing.xl },
   weekHead: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -141,8 +141,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   todayBtn: { ...elevation.raised, paddingHorizontal: spacing.md, height: 30, justifyContent: 'center', borderRadius: radius.sm, backgroundColor: colors.surface },
-  days: { gap: 32, paddingBottom: spacing.xxl },
+  days: { gap: 32, paddingBottom: spacing.xxl, paddingHorizontal: 2, paddingTop: 2 },
   day: {
+    ...elevation.raised,
     width: 90,
     height: 78,
     borderRadius: radius.lg,
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   dots: { flexDirection: 'row', gap: 3, height: 4, position: 'absolute', bottom: 8 },
-  dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.textSecondary },
+  dot: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent },
   todayDot: { backgroundColor: colors.text, width: 10 },
   grid: { marginLeft: -3 },
   hourRow: {
@@ -166,9 +167,9 @@ const styles = StyleSheet.create({
   events: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 24, alignItems: 'center' },
   event: {
     ...elevation.raised,
-    height: 40,
+    height: 46,
     paddingHorizontal: spacing.lg,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     backgroundColor: colors.surface,
     justifyContent: 'center',
   },
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
     gap: 6,
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: colors.selected,
+    borderColor: colors.accent,
     borderStyle: 'dashed',
   },
 });

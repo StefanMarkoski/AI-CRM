@@ -99,3 +99,25 @@ export function respond(prompt: string, data: Snapshot): string {
 
   return "I can help you plan your day, summarize a client, find overdue work, or draft emails from your templates. Try: “Draft a follow-up for ABC Packaging”.";
 }
+
+/** "Ai Draft" in the template form: a body built from the template name / subject. */
+export function draftTemplate(name: string, subject: string): string {
+  const topic = `${name} ${subject}`.toLowerCase();
+  if (/pay|invoice|remind/.test(topic)) {
+    return "Hi {{firstName}},\nI hope all is well at {{company}}. A quick reminder that our latest invoice is now due.\nIf it's already been paid, thank you — please ignore this note. If anything is unclear, just reply and I'll help right away.\nBest regards,";
+  }
+  if (/deliver|ship|order/.test(topic)) {
+    return "Hi {{firstName}},\nGood news — your order for {{company}} has left our warehouse and is on its way.\nI'll send the tracking details as soon as our logistics partner shares them.\nBest regards,";
+  }
+  if (/intro|hello|meet/.test(topic)) {
+    return "Hi {{firstName}},\nI'm reaching out because we help companies like {{company}} get packaging that looks great and ships safely.\nWould you be open to a 15-minute call next week to see if there's a fit?\nBest regards,";
+  }
+  return `Hi {{firstName}},\nI wanted to follow up regarding ${subject.trim() || name.trim() || 'our last conversation'}.\nLet me know if you have any questions — I'm happy to adjust anything for {{company}}.\nBest regards,`;
+}
+
+/** "Ai Personalize" in the send form: adds a client-specific opener and sign-off. */
+export function personalize(body: string, client: Client): string {
+  const opener = `Hope things are going well at ${client.company} — thanks again for your time recently.`;
+  const lines = body.split('\n');
+  return [lines[0], opener, ...lines.slice(1)].join('\n');
+}
